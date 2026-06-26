@@ -197,4 +197,4 @@ This project was self-initiated as a portfolio piece to demonstrate:
 ---
 
 Built with ❤️ by Sumeet Rana  
-Portfolio: [sumeetrana.dev](https://sumeetrana.dev) | Email: sumeet.rana@innovaccer.com
+Portfolio: [sumeetrana.com](https://sumeetrana.com) | Email: sumeetsinh28@innovaccer.com
