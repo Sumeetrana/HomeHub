@@ -1,0 +1,117 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DATABASE_URL_UNPOOLED")
+}
+
+enum PropertyPurpose {
+  BUY
+  RENT
+}
+
+enum PropertyType {
+  APARTMENT
+  VILLA
+  TOWNHOUSE
+  PENTHOUSE
+  STUDIO
+  OFFICE
+  SHOP
+  WAREHOUSE
+  LAND
+}
+
+enum PropertyStatus {
+  ACTIVE
+  SOLD
+  RENTED
+}
+
+model Property {
+  id          String          @id @default(cuid())
+  slug        String          @unique
+  title       String
+  description String          @db.Text
+  price       Float
+  currency    String          @default("AED")
+  purpose     PropertyPurpose
+  type        PropertyType
+  status      PropertyStatus  @default(ACTIVE)
+  featured    Boolean         @default(false)
+
+  // Location
+  address   String
+  city      String
+  community String?
+  country   String @default("UAE")
+
+  // Details
+  bedrooms  Int
+  bathrooms Int
+  area      Float
+  areaUnit  String @default("sqft")
+  floor     Int?
+  yearBuilt Int?
+  parking   Int    @default(0)
+
+  // Seller contact (no auth required)
+  sellerName  String
+  sellerEmail String?
+  sellerPhone String?
+
+  // Meta
+  views     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  images    PropertyImage[]
+  amenities PropertyAmenity[]
+
+  @@index([city])
+  @@index([purpose])
+  @@index([type])
+  @@index([status])
+  @@index([featured])
+  @@index([price])
+  @@map("properties")
+}
+
+model PropertyImage {
+  id         String   @id @default(cuid())
+  propertyId String
+  url        String
+  alt        String?
+  isPrimary  Boolean  @default(false)
+  order      Int      @default(0)
+  createdAt  DateTime @default(now())
+
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@index([propertyId])
+  @@map("property_images")
+}
+
+model Amenity {
+  id         String            @id @default(cuid())
+  name       String            @unique
+  icon       String?
+  category   String?
+  properties PropertyAmenity[]
+
+  @@map("amenities")
+}
+
+model PropertyAmenity {
+  propertyId String
+  amenityId  String
+
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  amenity  Amenity  @relation(fields: [amenityId], references: [id], onDelete: Cascade)
+
+  @@id([propertyId, amenityId])
+  @@map("property_amenities")
+}
